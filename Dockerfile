@@ -32,6 +32,17 @@ COPY . .
 # Install dependency Laravel
 RUN composer install --no-dev --optimize-autoloader
 
+# Buat folder yang dibutuhkan Laravel
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
+# Berikan permission
+RUN chmod -R 775 storage bootstrap/cache
+
 EXPOSE 8080
 
 CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
