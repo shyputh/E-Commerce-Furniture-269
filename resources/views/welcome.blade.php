@@ -473,7 +473,7 @@
             <div class="banner-content">
                 <span class="subtitle">PILIHAN EDITOR</span>
                 <h2>Satu objek, banyak momen.</h2>
-                <p>Kursi Rattan Sora dibuat untuk waktu yang berjalan lambat—dibaca, beristirahat, atau sekadar duduk menikmati cahaya sore.</p>
+                <p>Kursi Rattan Sora dibuat untuk waktu yang berjalan lambat—membaca, beristirahat, atau sekadar duduk menikmati cahaya sore.</p>
             </div>
             <div class="banner-image">
                 <img src="https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=800&auto=format&fit=crop" alt="Sofa melengkung">
