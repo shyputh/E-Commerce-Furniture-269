@@ -221,16 +221,93 @@ const ORDER_STATUS = { pending:'Menunggu Bayar', paid:'Sudah Dibayar', shipped:'
 const ORDER_BADGE  = { pending:'badge-pending', paid:'badge-paid', shipped:'badge-shipped', completed:'badge-completed', cancelled:'badge-cancelled' };
 const DELIVERY_STATUS = { preparing:'Diproses', shipped:'Dikirim', delivered:'Terkirim' };
 
-/* ── Product image pool (Unsplash fallback) ── */
-const IMG_POOL = [
-  'https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1507149129528-662589e4ec30?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1540518614846-7eded433c457?q=80&w=600&auto=format&fit=crop',
-];
-function prodImg(id) { return IMG_POOL[id % IMG_POOL.length]; }
+/*
+ * ── PRODUCT IMAGE MAP ──────────────────────────────────────────────────────
+ * Urutan sesuai ProductSeeder: id 1-10 Ruang Tamu, 11-20 Kamar Tidur,
+ * 21-30 Dapur, 31-40 Ruang Makan, 41-50 Penyimpanan, 51-60 Dekorasi.
+ * Ganti URL di sini kapan saja tanpa menyentuh database.
+ * ──────────────────────────────────────────────────────────────────────────
+ */
+const PRODUCT_IMG_MAP = {
+  // ── Ruang Tamu (1-10) ────────────────────────────────────────────────────
+  1:  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop',
+  2:  'https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=600&auto=format&fit=crop',
+  3:  'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?q=80&w=600&auto=format&fit=crop',
+  4:  'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=600&auto=format&fit=crop',
+  5:  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe3ggBbr2GbCGGuP1JMejeq4XRQC9HSWpqUOTPV5zwbQ&s=10',
+  6:  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop',
+  7:  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=600&auto=format&fit=crop',
+  8:  'https://images.unsplash.com/photo-1507149129528-662589e4ec30?q=80&w=600&auto=format&fit=crop',
+  9:  'https://images.unsplash.com/photo-1616047006789-b7af5afb8c20?q=80&w=600&auto=format&fit=crop',
+  10: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=600&auto=format&fit=crop',
+
+  // ── Kamar Tidur (11-20) ──────────────────────────────────────────────────
+  11: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?q=80&w=600&auto=format&fit=crop',
+  12: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600&auto=format&fit=crop',
+  13: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
+  14: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=600&auto=format&fit=crop',
+  15: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=600&auto=format&fit=crop',
+  16: 'https://images.unsplash.com/photo-1592435873989-2dcaa52bcf05?q=80&w=600&auto=format&fit=crop',
+  17: 'https://images.unsplash.com/photo-1507149129528-662589e4ec30?q=80&w=600&auto=format&fit=crop',
+  18: 'https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?q=80&w=600&auto=format&fit=crop',
+  19: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=600&auto=format&fit=crop',
+  20: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=600&auto=format&fit=crop',
+
+  // ── Dapur (21-30) ────────────────────────────────────────────────────────
+  21: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_shI6i7TLumNyXZoCxuyUkmKInkjPDCPOICTbq-6MCw&s=10',
+  22: 'https://images.unsplash.com/photo-1519947486511-46149fa0a254?q=80&w=600&auto=format&fit=crop',
+  23: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=600&auto=format&fit=crop',
+  24: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop',
+  25: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
+  26: 'https://images.unsplash.com/photo-1556228841-a3c527ebefe5?q=80&w=600&auto=format&fit=crop',
+  27: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=600&auto=format&fit=crop',
+  28: 'https://images.unsplash.com/photo-1565183997392-2f6f122e5912?q=80&w=600&auto=format&fit=crop',
+  29: 'https://images.unsplash.com/photo-1556228720-da6474490b18?q=80&w=600&auto=format&fit=crop',
+  30: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=600&auto=format&fit=crop',
+
+  // ── Ruang Makan (31-40) ──────────────────────────────────────────────────
+  31: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?q=80&w=600&auto=format&fit=crop',
+  32: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop',
+  33: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?q=80&w=600&auto=format&fit=crop',
+  34: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=600&auto=format&fit=crop',
+  35: 'https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?q=80&w=600&auto=format&fit=crop',
+  36: 'https://images.unsplash.com/photo-1574180566232-aaad1b5b8450?q=80&w=600&auto=format&fit=crop',
+  37: 'https://images.unsplash.com/photo-1565183997392-2f6f122e5912?q=80&w=600&auto=format&fit=crop',
+  38: 'https://images.unsplash.com/photo-1559181567-c3190bac4d52?q=80&w=600&auto=format&fit=crop',
+  39: 'https://images.unsplash.com/photo-1556228841-a3c527ebefe5?q=80&w=600&auto=format&fit=crop',
+  40: 'https://images.unsplash.com/photo-1592892132332-cf1cf4f4e10f?q=80&w=600&auto=format&fit=crop',
+
+  // ── Penyimpanan (41-50) ──────────────────────────────────────────────────
+  41: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop',
+  42: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=600&auto=format&fit=crop',
+  43: 'https://images.unsplash.com/photo-1588854337236-6889d631faa8?q=80&w=600&auto=format&fit=crop',
+  44: 'https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=600&auto=format&fit=crop',
+  45: 'https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?q=80&w=600&auto=format&fit=crop',
+  46: 'https://images.unsplash.com/photo-1574180566232-aaad1b5b8450?q=80&w=600&auto=format&fit=crop',
+  47: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=600&auto=format&fit=crop',
+  48: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=600&auto=format&fit=crop',
+  49: 'https://images.unsplash.com/photo-1592435873989-2dcaa52bcf05?q=80&w=600&auto=format&fit=crop',
+  50: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?q=80&w=600&auto=format&fit=crop',
+
+  // ── Dekorasi (51-60) ─────────────────────────────────────────────────────
+  51: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=600&auto=format&fit=crop',
+  52: 'https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=600&auto=format&fit=crop',
+  53: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=600&auto=format&fit=crop',
+  54: 'https://images.unsplash.com/photo-1547393947-1849a9bc45f4?q=80&w=600&auto=format&fit=crop',
+  55: 'https://images.unsplash.com/photo-1513569771920-c9e1d31714af?q=80&w=600&auto=format&fit=crop',
+  56: 'https://images.unsplash.com/photo-1598880940942-e43af8fad781?q=80&w=600&auto=format&fit=crop',
+  57: 'https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?q=80&w=600&auto=format&fit=crop',
+  58: 'https://images.unsplash.com/photo-1574180566232-aaad1b5b8450?q=80&w=600&auto=format&fit=crop',
+  59: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?q=80&w=600&auto=format&fit=crop',
+  60: 'https://images.unsplash.com/photo-1559181567-c3190bac4d52?q=80&w=600&auto=format&fit=crop',
+};
+
+const FALLBACK_IMG = 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600&auto=format&fit=crop';
+
+/** Kembalikan URL gambar untuk product ID tertentu. */
+function prodImg(id) {
+  return PRODUCT_IMG_MAP[id] || FALLBACK_IMG;
+}
 
 /* ── Logout ── */
 async function authLogout() {
