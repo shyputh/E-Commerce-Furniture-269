@@ -1,19 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Tidak Ditemukan</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; }
-        h1 { font-size: 50px; color: #e3342f; }
-        p { font-size: 18px; color: #666; }
-        a { text-decoration: none; color: #3490dc; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <h1>404</h1>
-    <p>Maaf, halaman yang Anda cari tidak ditemukan.</p>
-    <!-- <a href="{{ url('/') }}">Kembali ke Beranda</a> -->
-</body>
-</html>
+@extends('_layout')
+@section('title', '404 — RUMASELI')
+@section('content')
+<div style="min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 5%">
+  <span class="subtitle">404</span>
+  <h1 style="font-family:var(--serif);font-size:3.5rem;margin-bottom:1rem">Halaman tidak ditemukan.</h1>
+  <p style="color:var(--muted);font-size:.95rem;margin-bottom:2.5rem;max-width:420px;line-height:1.7">
+    Sepertinya halaman yang Anda cari sudah dipindahkan atau tidak pernah ada.
+  </p>
+  <a href="/" class="btn">Kembali ke Beranda</a>
+</div>
+@endsection
