@@ -80,6 +80,7 @@ resources/views/
     ├── products.blade.php
     ├── categories.blade.php
     └── vouchers.blade.php
+    └── _layout_admin.blade.php
 
 routes/
 ├── api.php    # REST API endpoints
