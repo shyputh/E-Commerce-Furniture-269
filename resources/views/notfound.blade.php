@@ -14,6 +14,6 @@
 <body>
     <h1>404</h1>
     <p>Maaf, halaman yang Anda cari tidak ditemukan.</p>
-    <a href="{{ url('/') }}">Kembali ke Beranda</a>
+    <!-- <a href="{{ url('/') }}">Kembali ke Beranda</a> -->
 </body>
 </html>

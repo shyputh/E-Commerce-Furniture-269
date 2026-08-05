@@ -4,12 +4,376 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RUMASELI — Curated Home Living</title>
-    <link rel="stylesheet" href="style.css">
+    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('style.css') }}">></head>
+    
+    <!-- INTERNAL CSS -->
+    <style>
+        /* --- Variables & Reset --- */
+        :root {
+            --bg-color: #F8F7F3;
+            --text-main: #2A2A2A;
+            --text-light: #7A7A7A;
+            --accent-brown: #AF8B6E;
+            --banner-bg: #EAE6DF;
+            --footer-bg: #1A1A1A;
+            --font-serif: 'Lora', serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- Typography --- */
+        h1, h2 {
+            font-family: var(--font-serif);
+            font-weight: 400;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: var(--accent-brown);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Navigation --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            background-color: var(--bg-color);
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 4rem 5%;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 2.5rem;
+            max-width: 90%;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-brown);
+            color: #fff;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .hero-image img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+        }
+
+        /* --- Categories Section --- */
+        .categories {
+            padding: 6rem 5%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #E0DFD8;
+            padding-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-brown);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .cat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-card img {
+            width: 100%;
+            aspect-ratio: 4/5;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .cat-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .cat-label {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* --- Products Section --- */
+        .products {
+            padding: 4rem 5%;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .prod-card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+
+        .prod-info .prod-cat {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--accent-brown);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .prod-info h3 {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .prod-info p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* --- Editor Banner Section --- */
+        .editor-banner {
+            padding: 4rem 5%;
+        }
+
+        .banner-container {
+            background-color: var(--banner-bg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            padding: 4rem;
+            align-items: center;
+        }
+
+        .banner-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .banner-content p {
+            font-size: 1rem;
+            color: var(--text-main);
+            max-width: 90%;
+        }
+
+        .banner-image {
+            position: relative;
+        }
+
+        .banner-image img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+
+        .banner-caption {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .banner-caption span:last-child {
+            color: var(--text-light);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--footer-bg);
+            color: #F8F7F3;
+            padding: 4rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4rem;
+        }
+
+        .footer-left h2 {
+            color: #F8F7F3;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-left p {
+            font-size: 0.85rem;
+            color: #A0A0A0;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* --- Animations & Responsiveness --- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 992px) {
+            .hero, .banner-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .banner-container {
+                padding: 2rem;
+            }
+            .hero h1 {
+                font-size: 3rem;
+            }
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .category-grid, .product-grid {
+                grid-template-columns: 1fr;
+            }
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
 <body>
 
     <!-- Navigation -->
@@ -21,9 +385,7 @@
             <li><a href="#">MEJA & MAKAN</a></li>
         </ul>
         <div class="nav-icons">
-            <!-- Search Icon -->
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <!-- Cart Icon -->
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
         </div>
     </nav>
@@ -111,7 +473,7 @@
             <div class="banner-content">
                 <span class="subtitle">PILIHAN EDITOR</span>
                 <h2>Satu objek, banyak momen.</h2>
-                <p>Kursi Rattan Sora dibuat untuk waktu yang berjalan lambat—dibaca, beristirahat, atau sekadar duduk menikmati cahaya sore.</p>
+                <p>Kursi Rattan Sora dibuat untuk waktu yang berjalan lambat—membaca, beristirahat, atau sekadar duduk menikmati cahaya sore.</p>
             </div>
             <div class="banner-image">
                 <img src="https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=800&auto=format&fit=crop" alt="Sofa melengkung">
@@ -141,5 +503,30 @@
         </div>
     </footer>
 
-<script src="{{ asset('script.js') }}"></script></body>
+    <!-- INTERNAL JAVASCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const fadeElements = document.querySelectorAll('.fade-in');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            fadeElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+</body>
 </html>
