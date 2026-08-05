@@ -6,11 +6,12 @@ REST API backend untuk e-commerce furniture single-seller, dibangun dengan Larav
 - Laravel 13, PHP 8.5.3, MySQL, Laravel Sanctum
 
 ## Fitur
-- Auth berbasis role (customer/admin) dengan Sanctum
-- Manajemen produk & kategori
-- Keranjang belanja
-- Checkout dengan validasi stok & voucher
+- Autentikasi & otorisasi berbasis role (customer/admin) dengan Sanctum
+- Manajemen kategori & produk (CRUD, admin-only untuk create/update/delete)
+- Keranjang belanja per customer
+- Checkout dengan validasi stok, snapshot harga, dan voucher diskon (transaksi database, all-or-nothing)
 - Tracking status order, pembayaran, dan pengiriman
+- Otorisasi resource-level lewat Laravel Policy (customer hanya bisa akses order/cart miliknya sendiri)
 
 ## Instalasi
 1. `composer install`
