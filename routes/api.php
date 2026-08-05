@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/categories', [CategoryController::class, 'index']); 
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
-Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::put('/categories/{category}', [CategoryController::class, 'update']);
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
@@ -27,14 +27,14 @@ Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::middleware(['auth:sanctum', 'role:Admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 });
 
 Route::get('/cartItem', [CartItemController::class, 'index']);
-Route::middleware(['auth:sanctum', 'role:Customer'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::post('/cartItem', [CartItemController::class, 'store']);
     Route::put('/cartItem/{cartItem}', [CartItemController::class, 'update']);
     Route::delete('/cartItem/{cartItem}', [CartItemController::class, 'destroy']);
