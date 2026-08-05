@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('phone');
-            $table->text('address');
-            $table->timestamps();
+        Schema::table('cart_items', function (Blueprint $table) {
+            $table->decimal('total', 10, 2)->after('qty')->default(0);
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::table('cart_items', function (Blueprint $table) {
+            $table->dropColumn('total');
+        });
     }
 };
