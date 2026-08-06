@@ -18,12 +18,12 @@ class Customer extends Model
         'address',
     ];
 
-    public function order()
+    public function orders()
     {
         return $this->hasMany(Order::class);
     }    
     
-    public function cartitem()
+    public function cartItem()
     {
         return $this->hasMany(CartItem::class);
     }

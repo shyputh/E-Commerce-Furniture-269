@@ -1,4 +1,4 @@
-@extends('_layout')
+{{-- @extends('_layout') 
 @section('title', 'Kelola Pesanan — Admin RUMASELI')
 @section('head')
 <style>
@@ -238,5 +238,314 @@ async function handleDelivery() {
     await loadOrder();
   } catch(e) { flash(e.data?.message || 'Gagal.', 'err'); }
 }
+</script>
+@endsection  --}}
+
+
+   
+@extends('_layout')
+@section('title', 'Detail & Pengiriman Pesanan (Admin) — RUMASELI')
+
+@section('head')
+<style>
+  .admin-container {
+      max-width: 1080px;
+      margin: 2.5rem auto;
+      padding: 0 5%;
+  }
+  .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      color: var(--muted, #666);
+      text-decoration: none;
+  }
+  .back-link:hover { color: var(--brown, #8B5E3C); }
+  
+  .order-header-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border, #eee);
+      padding-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+  }
+  .order-title { font-size: 1.75rem; font-family: var(--serif, Georgia, serif); margin-bottom: 0.25rem; }
+  .order-date { font-size: 0.85rem; color: var(--muted, #666); }
+  
+  .grid-layout {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 2rem;
+  }
+  
+  .panel {
+      background: #fff;
+      border: 1px solid var(--border, #eee);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      border-radius: 4px;
+  }
+  .panel-title {
+      font-family: var(--serif, Georgia, serif);
+      font-size: 1.15rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border, #f0f0f0);
+  }
+  
+  .detail-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+  }
+  .detail-list li {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      border-bottom: 1px dashed var(--border, #f0f0f0);
+      padding-bottom: 0.5rem;
+  }
+  .detail-list li:last-child { border-bottom: none; }
+  .detail-list li strong { color: var(--muted, #666); font-weight: 500; }
+  .detail-list li span { text-align: right; max-width: 65%; word-break: break-word; }
+  
+  .item-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .item-card { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px dashed var(--border, #f0f0f0); 
+      padding-bottom: 0.75rem; 
+  }
+  .item-card:last-child { border-bottom: none; padding-bottom: 0; }
+  .item-info { flex: 1; }
+  .item-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .item-meta { font-size: 0.8rem; color: var(--muted, #666); }
+  .item-subtotal { font-weight: 600; font-size: 0.9rem; text-align: right; }
+
+  .badge-status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      text-transform: uppercase;
+  }
+  .badge-pending { background: #fff3cd; color: #856404; }
+  .badge-paid, .badge-verified, .badge-success { background: #d4edda; color: #155724; }
+  .badge-shipped, .badge-preparing { background: #cce5ff; color: #004085; }
+  .badge-completed, .badge-delivered { background: #d1ecf1; color: #0c5460; }
+  .badge-cancelled, .badge-failed { background: #f8d7da; color: #721c24; }
+
+  @media (max-width: 768px) {
+      .grid-layout { grid-template-columns: 1fr; }
+  }
+</style>
+@endsection
+
+@section('content')
+<div class="admin-container">
+    <a href="/admin/orders" class="back-link">
+        ← Kembali ke Daftar Pesanan
+    </a>
+
+    <div id="loading-state" style="padding: 2rem; text-align: center; color: var(--muted);">
+        Memuat detail pesanan...
+    </div>
+
+    <div id="order-content" style="display: none;">
+        <div class="order-header-box">
+            <div>
+                <h1 class="order-title" id="order-number">Pesanan #...</h1>
+                <div class="order-date" id="order-date">Tanggal: -</div>
+            </div>
+            <div>
+                <span id="order-status-badge" class="badge-status">...</span>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <div>
+                <div class="panel">
+                    <h2 class="panel-title">Informasi Pelanggan</h2>
+                    <ul class="detail-list" id="customer-info-list"></ul>
+                </div>
+
+                <div class="panel">
+                    <h2 class="panel-title">Produk yang Dibeli</h2>
+                    <div class="item-list" id="products-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2 class="panel-title">Rincian Tagihan</h2>
+                    <ul class="detail-list" id="payment-info-list"></ul>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel">
+                    <h2 class="panel-title">Logistik & Pengiriman</h2>
+                    <form onsubmit="handleDeliverySubmit(event)">
+                        
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label class="form-label" style="display:block; font-size: 0.8rem; margin-bottom: 0.3rem;">Ekspedisi / Kurir</label>
+                            <input type="text" class="form-input" id="input-courier" placeholder="Contoh: JNE / J&T / Sicepat" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                        </div>
+                        
+                        <div id="delivery-update-fields" style="display: none; padding-top: 1rem; border-top: 1px dashed var(--border); margin-top: 1rem;">
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label class="form-label" style="display:block; font-size: 0.8rem; margin-bottom: 0.3rem;">Status Pengiriman</label>
+                                <select class="form-input" id="select-delivery-status" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;">
+                                    <option value="preparing">Preparing (Sedang Dikemas)</option>
+                                    <option value="shipped">Shipped (Dalam Perjalanan)</option>
+                                    <option value="delivered">Delivered (Telah Diterima)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-full" id="btn-delivery-submit" style="margin-top: 0.5rem;">Simpan Logistik</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const currentOrderId = pathSegments[pathSegments.length - 1];
+
+    let currentDelivery = null; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadOrderDetail();
+    });
+
+    async function loadOrderDetail() {
+        try {
+            const res = await api('GET', `/orders/${currentOrderId}`);
+            const order = res.data || res;
+
+            renderOrder(order);
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('order-content').style.display = 'block';
+        } catch (error) {
+            showToast(error.message || 'Gagal memuat detail pesanan', 'error');
+            document.getElementById('loading-state').textContent = 'Gagal memuat data pesanan.';
+        }
+    }
+
+    function renderOrder(order) {
+        document.getElementById('order-number').textContent = `Pesanan #${order.order_number || order.id}`;
+        document.getElementById('order-date').textContent = `Tanggal: ${new Date(order.created_at).toLocaleString('id-ID')}`;
+        
+        const badge = document.getElementById('order-status-badge');
+        badge.textContent = (order.status || 'pending').toUpperCase();
+        badge.className = `badge-status badge-${order.status || 'pending'}`;
+
+        const customer = order.customer || order.user || {};
+        const customerName = order.name || order.customer_name || order.recipient_name || customer.user.name || '-';
+        const customerEmail = order.email || order.customer_email || order.recipient_email || customer.user.email || '-';
+        const customerPhone = order.phone || order.shipping_phone || order.recipient_phone || customer.phone || customer.phone_number || '-';
+        const address = order.address || order.shipping_address || order.destination || customer.address || '-';
+
+        document.getElementById('customer-info-list').innerHTML = `
+            <li><strong>Nama Pembeli</strong> <span>${customerName}</span></li>
+            <li><strong>Email</strong> <span>${customerEmail}</span></li>
+            <li><strong>No. HP/WA</strong> <span>${customerPhone}</span></li>
+            <li><strong>Alamat Pengiriman</strong> <span>${address}</span></li>
+        `;
+
+        const items = order.items || order.order_items || [];
+        const productsListEl = document.getElementById('products-list');
+        productsListEl.innerHTML = '';
+        let calculatedSubtotal = 0;
+
+        if (items.length === 0) {
+            productsListEl.innerHTML = '<p style="font-size:0.85rem; color: var(--muted);">Tidak ada produk pada pesanan ini.</p>';
+        } else {
+            items.forEach(item => {
+                const product = item.product || {};
+                const itemPrice = parseFloat(item.price || product.price || 0);
+                const qty = parseInt(item.quantity || item.qty || 1);
+                const subtotal = itemPrice * qty;
+                calculatedSubtotal += subtotal;
+
+                productsListEl.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-name">${product.name || item.name || 'Nama Produk'}</div>
+                            <div class="item-meta">${qty} x ${rupiah(itemPrice)}</div>
+                        </div>
+                        <div class="item-subtotal">${rupiah(subtotal)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        const shippingFee = parseFloat(order.shipping_cost || order.delivery_fee || 0);
+        const grandTotal = parseFloat(order.total_amount || (calculatedSubtotal + shippingFee));
+
+        document.getElementById('payment-info-list').innerHTML = `
+            <li><strong>Subtotal Produk</strong> <span>${rupiah(calculatedSubtotal)}</span></li>
+            <li><strong>Biaya Pengiriman</strong> <span>${rupiah(shippingFee)}</span></li>
+            <li style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); font-size: 1rem;">
+                <strong>Total Keseluruhan</strong> <strong style="color: var(--brown, #8B5E3C);">${rupiah(grandTotal)}</strong>
+            </li>
+        `;
+
+        currentDelivery = order.delivery || null;
+        if (currentDelivery) {
+            document.getElementById('input-courier').value = currentDelivery.courier || '';
+            document.getElementById('select-delivery-status').value = currentDelivery.status || 'preparing';
+            
+            document.getElementById('delivery-update-fields').style.display = 'block';
+            document.getElementById('btn-delivery-submit').textContent = 'Perbarui Status Pengiriman';
+        } else {
+            document.getElementById('delivery-update-fields').style.display = 'none';
+            document.getElementById('btn-delivery-submit').textContent = 'Proses Pengiriman';
+        }
+    }
+
+    async function handleDeliverySubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-delivery-submit');
+        const courier = document.getElementById('input-courier').value;
+
+        btn.disabled = true;
+        btn.textContent = 'Menyimpan...';
+
+        try {
+            if (!currentDelivery) {
+                await api('POST', `/orders/${currentOrderId}/delivery`, { courier });
+                showToast('Pengiriman berhasil diproses.', 'success');
+            } else {
+                const status = document.getElementById('select-delivery-status').value;
+
+                await api('PUT', `/deliveries/${currentDelivery.id}`, {
+                    courier,
+                    status
+                });
+                showToast('Status pengiriman berhasil diperbarui.', 'success');
+            }
+            
+            loadOrderDetail();
+        } catch (err) {
+            showToast(err.message || 'Gagal menyimpan data pengiriman', 'error');
+            btn.disabled = false;
+            btn.textContent = currentDelivery ? 'Perbarui Status Pengiriman' : 'Proses Pengiriman';
+        }
+    }
 </script>
 @endsection

@@ -88,21 +88,27 @@ table.admin-table tr:hover td{background:var(--bg);}
 
 @section('scripts')
 <script>
+let allVouchers = [];
 let editId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.getUser() || !Auth.isAdmin()) { window.location.href = '/login'; return; }
-  document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  if (document.getElementById('sidebar-name')) {
+    document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  }
   await loadVouchers();
 });
 
 async function loadVouchers() {
   try {
     const vouchers = await api('GET', '/vouchers');
+    allVouchers = vouchers; // Simpan data ke variabel global
+
     if (vouchers.length === 0) {
       document.getElementById('vouchers-table').innerHTML = `<p style="padding:2rem;font-size:.85rem;color:var(--muted)">Belum ada voucher.</p>`;
       return;
     }
+    
     document.getElementById('vouchers-table').innerHTML = `
       <table class="admin-table">
         <thead><tr><th>Kode</th><th>Nilai Diskon</th><th></th></tr></thead>
@@ -112,7 +118,7 @@ async function loadVouchers() {
             <td style="font-weight:500">${rupiah(v.discount_value)}</td>
             <td>
               <div style="display:flex;gap:1rem">
-                <button class="action-link" onclick="openModal({id:${v.id},code:'${v.code}',discount_value:${v.discount_value}})">Edit</button>
+                <button class="action-link" onclick="openEditModal(${v.id})">Edit</button>
                 <button class="action-link danger" onclick="deleteVoucher(${v.id})">Hapus</button>
               </div>
             </td>
@@ -130,6 +136,11 @@ function updatePreview() {
   el.textContent = val > 0 ? '= ' + rupiah(val) : '';
 }
 
+function openEditModal(id) {
+  const voucher = allVouchers.find(v => v.id === id);
+  openModal(voucher);
+}
+
 function openModal(v = null) {
   editId = v?.id ?? null;
   document.getElementById('f-code').value = v?.code ?? '';
@@ -137,43 +148,67 @@ function openModal(v = null) {
   document.getElementById('err-code').textContent = '';
   document.getElementById('err-discount_value').textContent = '';
   document.getElementById('discount-preview').textContent = v?.discount_value > 0 ? '= ' + rupiah(v.discount_value) : '';
+  
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = false; // Reset tombol agar tidak terkunci
+  btn.textContent = editId ? 'Simpan' : 'Tambah';
+  
   document.getElementById('modal-title').textContent = editId ? 'Edit Voucher' : 'Tambah Voucher';
-  document.getElementById('modal-save-btn').textContent = editId ? 'Simpan' : 'Tambah';
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('f-code').focus(), 100);
 }
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function closeModal() { 
+  document.getElementById('modal-overlay').classList.remove('open'); 
+}
 
 async function saveVoucher() {
   ['code','discount_value'].forEach(f => document.getElementById('err-'+f).textContent = '');
   const code = document.getElementById('f-code').value.trim().toUpperCase();
   const discount_value = Number(document.getElementById('f-discount_value').value);
+  
   if (!code) { document.getElementById('err-code').textContent = 'Kode wajib diisi.'; return; }
   if (!discount_value || discount_value <= 0) { document.getElementById('err-discount_value').textContent = 'Nilai diskon harus lebih dari 0.'; return; }
 
   const btn = document.getElementById('modal-save-btn');
-  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  btn.disabled = true; 
+  btn.textContent = 'Menyimpan...';
+
   try {
-    if (editId) await api('PUT', '/vouchers/'+editId, { code, discount_value });
-    else await api('POST', '/vouchers', { code, discount_value });
+    if (editId) {
+      await api('PUT', '/vouchers/' + editId, { code, discount_value });
+    } else {
+      await api('POST', '/vouchers', { code, discount_value });
+    }
     closeModal();
     showToast(editId ? 'Voucher diperbarui.' : 'Voucher ditambahkan.', 'success');
     await loadVouchers();
   } catch(e) {
-    btn.disabled = false; btn.textContent = editId ? 'Simpan' : 'Tambah';
     const errs = e.data?.errors;
-    if (errs) Object.entries(errs).forEach(([k,v]) => { const el=document.getElementById('err-'+k); if(el) el.textContent=v[0]; });
-    else showToast(e.data?.message || 'Gagal menyimpan.', 'error');
+    if (errs) {
+      Object.entries(errs).forEach(([k,v]) => { 
+        const el = document.getElementById('err-' + k); 
+        if(el) el.textContent = v[0]; 
+      });
+    } else {
+      showToast(e.data?.message || 'Gagal menyimpan.', 'error');
+    }
+  } finally {
+    // Selalu reset tombol aktif setelah proses berhasil ataupun gagal
+    btn.disabled = false; 
+    btn.textContent = editId ? 'Simpan' : 'Tambah';
   }
 }
 
 async function deleteVoucher(id) {
   if (!confirm('Hapus voucher ini?')) return;
   try {
-    await api('DELETE', '/vouchers/'+id);
+    await api('DELETE', '/vouchers/' + id);
     showToast('Voucher dihapus.', 'success');
     await loadVouchers();
-  } catch(e) { showToast(e.data?.message || 'Gagal menghapus.', 'error'); }
+  } catch(e) { 
+    showToast(e.data?.message || 'Gagal menghapus.', 'error'); 
+  }
 }
 </script>
 @endsection

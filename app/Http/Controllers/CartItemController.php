@@ -9,11 +9,15 @@ use App\Http\Requests\UpdateCartItemRequest;
 
 class CartItemController extends Controller
 {
-    public function index(Request $request)
+   public function index(Request $request)
     {
-        $cartItems = $request->user()->customer->cartItems()->with('product')->get();
+        $customer = $request->user()->customer;
 
-        return response()->json($cartItems);
+        if (! $customer) {
+            return response()->json(['message' => 'Profil customer tidak ditemukan.'], 404);
+        }
+
+        return response()->json($customer->cartItem()->with('product')->get());
     }
 
     public function store(StoreCartItemRequest $request)

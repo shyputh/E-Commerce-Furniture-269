@@ -9,6 +9,7 @@ class OrderPolicy
 {
     public function view(User $user, Order $order): bool
     {
-        return $user->customer?->id === $order->customer_id;
+        return $user->role?->name === 'admin' || $user->customer?->id === $order->customer_id;
     }
+    
 }

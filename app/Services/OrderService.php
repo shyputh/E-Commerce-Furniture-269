@@ -43,7 +43,7 @@ class OrderService
             $subtotal = $cartItem->sum(fn ($item) => $item->qty * $item->product->price);
             $total = max($subtotal - ($voucher->discount_value ?? 0), 0);
 
-            $order = Order::create([                                 
+            $order = Order::create([
                 'customer_id' => $customer->id,
                 'voucher_id' => $voucher?->id,
                 'status' => 'pending',
@@ -51,7 +51,7 @@ class OrderService
             ]);
 
             foreach ($cartItem as $item) {
-                $order->orderItem()->create([
+                $order->orderItems()->create([
                     'product_id' => $item->product_id,
                     'qty' => $item->qty,
                     'price_snapshot' => $item->product->price,

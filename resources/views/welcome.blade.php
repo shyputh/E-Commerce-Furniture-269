@@ -108,7 +108,7 @@
       <div class="prod-card-info">
         <span class="prod-cat">SEATING</span>
         <h3>Meja Belajar Stanova</h3>
-        <p>Rp 3.480.000</p>
+        <p>Rp 650.000</p>
       </div>
     </a>
     <a href="/products" class="prod-card">
@@ -118,17 +118,17 @@
       <div class="prod-card-info">
         <span class="prod-cat">TEXTILE</span>
         <h3>Linen Throw Nara</h3>
-        <p>Rp 680.000</p>
+        <p>Rp 380.000</p>
       </div>
     </a>
     <a href="/products" class="prod-card">
       <div class="prod-card-img">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUAQVVYgJRpFYdnKemf8ti8qEGZOjJ1LJmmPgYecX44g&s=10" alt="Lampu Tidur" loading="lazy">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUAQVVYgJRpFYdnKemf8ti8qEGZOjJ1LJmmPgYecX44g&s=10" alt="Lampu Tidur LED" loading="lazy">
       </div>
       <div class="prod-card-info">
         <span class="prod-cat">LIGHTING</span>
         <h3>Lampu Tidur</h3>
-        <p>Rp 1.260.000</p>
+        <p>Rp 175.000</p>
       </div>
     </a>
     <a href="/products" class="prod-card">
@@ -138,7 +138,7 @@
       <div class="prod-card-info">
         <span class="prod-cat">OBJECTS</span>
         <h3>Vas Tanah Liat</h3>
-        <p>Rp 540.000</p>
+        <p>Rp 875.000</p>
       </div>
     </a>
   </div>

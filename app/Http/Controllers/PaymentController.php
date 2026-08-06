@@ -22,8 +22,10 @@ class PaymentController extends Controller
 
         $payment = $order->payment()->create([
             'method' => $request->method,
-            'status' => 'pending',
+            'status' => 'paid', 
         ]);
+
+        $order->update(['status' => 'paid']);
 
         return response()->json($payment, 201);
     }

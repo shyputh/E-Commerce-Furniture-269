@@ -116,11 +116,14 @@ table.admin-table tr:hover td{background:var(--bg);}
 @section('scripts')
 <script>
 let allCategories = [];
+let allProducts = [];
 let editId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.getUser() || !Auth.isAdmin()) { window.location.href = '/login'; return; }
-  document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  if (document.getElementById('sidebar-name')) {
+    document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  }
   await loadAll();
 });
 
@@ -128,6 +131,7 @@ async function loadAll() {
   try {
     const [products, cats] = await Promise.all([api('GET','/products'), api('GET','/categories')]);
     allCategories = cats;
+    allProducts = products;
 
     // Fill select
     const sel = document.getElementById('f-category_id');
@@ -157,7 +161,7 @@ function renderTable(products) {
           <td style="color:var(--muted)">${p.material || '—'}</td>
           <td>
             <div style="display:flex;gap:1rem">
-              <button class="action-link" onclick="openModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+              <button class="action-link" onclick="openEditModal(${p.id})">Edit</button>
               <button class="action-link danger" onclick="deleteProduct(${p.id})">Hapus</button>
             </div>
           </td>
@@ -166,51 +170,87 @@ function renderTable(products) {
     </table>`;
 }
 
+function openEditModal(id) {
+  const product = allProducts.find(p => p.id === id);
+  openModal(product);
+}
+
 function openModal(product = null) {
   editId = product?.id ?? null;
+  
   ['category_id','name','price','stock','material','weight'].forEach(f => {
     document.getElementById('err-'+f).textContent = '';
     document.getElementById('f-'+f).value = product?.[f] ?? '';
   });
+
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = false; // Memastikan tombol tidak terkunci dalam status disabled
+  btn.textContent = editId ? 'Simpan' : 'Tambah';
+
   document.getElementById('modal-title').textContent = editId ? 'Edit Produk' : 'Tambah Produk';
-  document.getElementById('modal-save-btn').textContent = editId ? 'Simpan' : 'Tambah';
   document.getElementById('modal-overlay').classList.add('open');
 }
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function closeModal() { 
+  document.getElementById('modal-overlay').classList.remove('open'); 
+}
 
 async function saveProduct() {
   ['category_id','name','price','stock','material','weight'].forEach(f => document.getElementById('err-'+f).textContent = '');
+  
   const btn = document.getElementById('modal-save-btn');
-  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  btn.disabled = true; 
+  btn.textContent = 'Menyimpan...';
+
+  const catVal = document.getElementById('f-category_id').value;
+  const priceVal = document.getElementById('f-price').value;
+  const stockVal = document.getElementById('f-stock').value;
+  const weightVal = document.getElementById('f-weight').value;
+
   const body = {
-    category_id: Number(document.getElementById('f-category_id').value),
+    category_id: catVal ? Number(catVal) : null,
     name: document.getElementById('f-name').value,
-    price: Number(document.getElementById('f-price').value),
-    stock: Number(document.getElementById('f-stock').value),
+    price: priceVal !== '' ? Number(priceVal) : null,
+    stock: stockVal !== '' ? Number(stockVal) : null,
     material: document.getElementById('f-material').value,
-    weight: Number(document.getElementById('f-weight').value),
+    weight: weightVal !== '' ? Number(weightVal) : null,
   };
+
   try {
-    if (editId) await api('PUT', '/products/'+editId, body);
-    else await api('POST', '/products', body);
+    if (editId) {
+      await api('PUT', '/products/' + editId, body);
+    } else {
+      await api('POST', '/products', body);
+    }
     closeModal();
     showToast(editId ? 'Produk diperbarui.' : 'Produk ditambahkan.', 'success');
     await loadAll();
   } catch(e) {
-    btn.disabled = false; btn.textContent = editId ? 'Simpan' : 'Tambah';
     const errs = e.data?.errors;
-    if (errs) Object.entries(errs).forEach(([k,v]) => { const el=document.getElementById('err-'+k); if(el) el.textContent=v[0]; });
-    else showToast(e.data?.message || 'Gagal menyimpan.', 'error');
+    if (errs) {
+      Object.entries(errs).forEach(([k, v]) => { 
+        const el = document.getElementById('err-' + k); 
+        if (el) el.textContent = v[0]; 
+      });
+    } else {
+      showToast(e.data?.message || 'Gagal menyimpan.', 'error');
+    }
+  } finally {
+    // Selalu reset tombol ke status aktif dan teks yang sesuai setelah proses selesai
+    btn.disabled = false; 
+    btn.textContent = editId ? 'Simpan' : 'Tambah';
   }
 }
 
 async function deleteProduct(id) {
   if (!confirm('Hapus produk ini?')) return;
   try {
-    await api('DELETE', '/products/'+id);
+    await api('DELETE', '/products/' + id);
     showToast('Produk dihapus.', 'success');
     await loadAll();
-  } catch(e) { showToast(e.data?.message || 'Gagal menghapus.', 'error'); }
+  } catch(e) { 
+    showToast(e.data?.message || 'Gagal menghapus.', 'error'); 
+  }
 }
 </script>
 @endsection

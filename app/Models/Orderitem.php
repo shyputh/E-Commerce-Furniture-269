@@ -18,7 +18,7 @@ class OrderItem extends Model
         'price_snapshot',
     ];
 
-    public function order()
+    public function orders()
     {
         return $this->belongsTo(Order::class);
     }

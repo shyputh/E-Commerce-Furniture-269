@@ -16,7 +16,7 @@ class Order extends Model
 
     protected $fillable =[
         'customer_id',
-        'name',
+        'total',
         'status',
         'voucher_id',
     ];
@@ -36,7 +36,7 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }    
     
-    public function orderitem()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }    

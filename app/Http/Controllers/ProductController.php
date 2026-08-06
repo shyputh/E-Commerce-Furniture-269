@@ -11,7 +11,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return response()->json(Product::all());
+        return response()->json(Product::with('category')->get());
     }
 
     public function store(StoreProductRequest $request)

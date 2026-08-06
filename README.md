@@ -141,9 +141,7 @@ Untuk membuat akun admin secara manual setelah seeder berjalan:
 php artisan tinker
 ```
 ```php
-$user = User::create(['name' => 'Admin', 'email' => 'admin@rumaseli.com', 'password' => bcrypt('password')]);
-$user->role_id = Role::where('name', 'admin')->first()->id;
-$user->save();
+User::create(['name' => 'Admin', 'email' => 'admin@rumaseli.com', 'password' => bcrypt('password'), 'role_id' => '1']);
 ```
 
 ---

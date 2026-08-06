@@ -34,6 +34,8 @@ class AuthController extends Controller
             'address' => $validated['address'],
         ]);
 
+        $user->load('role');
+
         return response()->json([
             'user' => $user->load('customer'),
             'token' => $user->createToken('auth_token')->plainTextToken,
@@ -55,6 +57,8 @@ class AuthController extends Controller
             ]);
         }
 
+        $user->load('role');
+        
         return response()->json([
             'user' => $user,
             'token' => $user->createToken('auth_token')->plainTextToken,

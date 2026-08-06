@@ -12,7 +12,7 @@ class Delivery extends Model
 
     protected $fillable =[
         'order_id',
-        'tracking_no',
+        // 'tracking_no',
         'courier',
         'status',
     ];

@@ -116,6 +116,17 @@ table.admin-table tr:hover td{background:var(--bg);}
 <script>
 function fmtDate(iso){ return iso ? new Date(iso).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '—'; }
 
+// Helper untuk menghitung total order secara aman dari nilai float atau items
+function getOrderTotal(o) {
+  if (o.total !== null && o.total !== undefined && !isNaN(parseFloat(o.total))) {
+    return parseFloat(o.total);
+  }
+  const items = o.order_items ?? o.orderItems ?? [];
+  const discount = parseFloat(o.voucher?.discount_value || 0);
+  const subtotal = items.reduce((sum, i) => sum + (parseFloat(i.qty || 0) * parseFloat(i.price_snapshot || 0)), 0);
+  return Math.max(subtotal - discount, 0);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.getUser() || !Auth.isAdmin()) { window.location.href = '/login'; return; }
   document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
@@ -126,7 +137,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       api('GET', '/products'),
     ]);
 
-    const revenue = orders.filter(o => o.status !== 'cancelled').reduce((s,o) => s + (o.total ?? 0), 0);
+    // Menghitung total pendapatan dari pesanan yang tidak dibatalkan
+    const revenue = orders
+      .filter(o => o.status !== 'cancelled')
+      .reduce((s, o) => s + getOrderTotal(o), 0);
+
     const pending = orders.filter(o => o.status === 'pending').length;
     const lowStock = products.filter(p => p.stock <= 3).length;
 
@@ -154,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${recent.map(o => `<tr>
               <td style="font-family:monospace;font-size:.75rem;color:var(--muted)">#${String(o.id).padStart(5,'0')}</td>
               <td>${o.customer?.user?.name ?? '—'}</td>
-              <td style="font-weight:500">${o.total != null ? rupiah(o.total) : '—'}</td>
+              <td style="font-weight:500">${rupiah(getOrderTotal(o))}</td>
               <td><span class="badge ${ORDER_BADGE[o.status]??''}">${ORDER_STATUS[o.status]??o.status}</span></td>
               <td style="color:var(--muted);font-size:.8rem">${fmtDate(o.created_at)}</td>
               <td><span class="action-link" onclick="window.location='/admin/orders/${o.id}'">Kelola &rarr;</span></td>

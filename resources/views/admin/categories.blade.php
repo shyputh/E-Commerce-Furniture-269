@@ -1,5 +1,6 @@
 @extends('_layout')
 @section('title', 'Kategori — Admin RUMASELI')
+
 @section('head')
 <style>
 .admin-wrap{display:flex;min-height:calc(100vh - 80px);}
@@ -84,7 +85,9 @@ let editId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!Auth.getUser() || !Auth.isAdmin()) { window.location.href = '/login'; return; }
-  document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  if (document.getElementById('sidebar-name')) {
+    document.getElementById('sidebar-name').textContent = Auth.getUser()?.name ?? '—';
+  }
   await loadCategories();
 });
 
@@ -122,40 +125,65 @@ function openModal(cat = null) {
   document.getElementById('f-name').value = cat?.name ?? '';
   document.getElementById('err-name').textContent = '';
   document.getElementById('modal-title').textContent = editId ? 'Edit Kategori' : 'Tambah Kategori';
-  document.getElementById('modal-save-btn').textContent = editId ? 'Simpan' : 'Tambah';
+  
+  const btn = document.getElementById('modal-save-btn');
+  btn.disabled = false; // Reset tombol agar tidak terkunci dalam status disabled
+  btn.textContent = editId ? 'Simpan' : 'Tambah';
+
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('f-name').focus(), 100);
 }
-function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+function closeModal() { 
+  document.getElementById('modal-overlay').classList.remove('open'); 
+}
 
 async function saveCategory() {
   document.getElementById('err-name').textContent = '';
   const name = document.getElementById('f-name').value.trim();
-  if (!name) { document.getElementById('err-name').textContent = 'Nama wajib diisi.'; return; }
+  if (!name) { 
+    document.getElementById('err-name').textContent = 'Nama wajib diisi.'; 
+    return; 
+  }
+
   const btn = document.getElementById('modal-save-btn');
-  btn.disabled = true; btn.textContent = 'Menyimpan...';
+  btn.disabled = true; 
+  btn.textContent = 'Menyimpan...';
+
   try {
-    if (editId) await api('PUT', '/categories/'+editId, { name });
-    else await api('POST', '/categories', { name });
+    if (editId) {
+      await api('PUT', '/categories/' + editId, { name });
+    } else {
+      await api('POST', '/categories', { name });
+    }
     closeModal();
     showToast(editId ? 'Kategori diperbarui.' : 'Kategori ditambahkan.', 'success');
     await loadCategories();
   } catch(e) {
-    btn.disabled = false; btn.textContent = editId ? 'Simpan' : 'Tambah';
     const msg = e.data?.errors?.name?.[0] || e.data?.message || 'Gagal menyimpan.';
     document.getElementById('err-name').textContent = msg;
+  } finally {
+    // Memastikan tombol aktif kembali setelah proses selesai/gagal
+    btn.disabled = false; 
+    btn.textContent = editId ? 'Simpan' : 'Tambah';
   }
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) saveCategory(); });
+document.addEventListener('keydown', e => { 
+  if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) {
+    saveCategory(); 
+  }
+});
 
 async function deleteCategory(id) {
   if (!confirm('Hapus kategori ini? Produk yang terhubung mungkin terpengaruh.')) return;
   try {
-    await api('DELETE', '/categories/'+id);
+    await api('DELETE', '/categories/' + id);
     showToast('Kategori dihapus.', 'success');
     await loadCategories();
-  } catch(e) { showToast(e.data?.message || 'Gagal menghapus.', 'error'); }
+  } catch(e) { 
+    showToast(e.data?.message || 'Gagal menghapus.', 'error'); 
+  }
 }
 </script>
 @endsection

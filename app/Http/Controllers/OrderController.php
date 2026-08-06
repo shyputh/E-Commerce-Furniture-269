@@ -35,7 +35,9 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
-        return response()->json($order->load('orderItems.product', 'payment', 'delivery'));
+        return response()->json(
+            $order->load('orderItems.product', 'payment', 'delivery', 'customer.user', 'voucher')
+        );
     }
 
     public function adminIndex()
@@ -54,5 +56,22 @@ class OrderController extends Controller
         $order->update(['status' => $request->status]);
 
         return response()->json($order);
+    }
+
+    public function destroy(Order $order)
+    {
+        $order->orderItems()->delete();
+        
+        if ($order->payment) {
+            $order->payment()->delete();
+        }
+        
+        if ($order->delivery) {
+            $order->delivery()->delete();
+        }
+
+        $order->delete();
+
+        return response()->json(['message' => 'Pesanan berhasil dibatalkan dan dihapus']);
     }
 }

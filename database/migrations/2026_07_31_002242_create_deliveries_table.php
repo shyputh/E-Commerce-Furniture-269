@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->contsrained('orders')->onDelete('cascade');
             $table->string('courier');
-            $table->string('tracking_no');
+            // $table->string('tracking_no');
             $table->string('status');
             $table->timestamps();
         });

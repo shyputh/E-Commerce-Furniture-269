@@ -35,6 +35,9 @@
 .pay-error{font-size:.75rem;color:#c53030;margin-bottom:.75rem;display:none;}
 /* Delivery badge */
 .delivery-status{color:var(--brown);font-weight:600;}
+/* Btn Cancel */
+.btn-cancel {width: 100%; padding: 0.85rem; background: transparent; border: 1px solid #c53030; color: #c53030; border-radius: 4px; font-weight: 600; cursor: pointer; transition: all 0.2s;}
+.btn-cancel:hover {background: #fff5f5;}
 @media(max-width:900px){.order-body{grid-template-columns:1fr;}}
 @media(max-width:600px){.items-table th:nth-child(3),.items-table td:nth-child(3){display:none;}}
 </style>
@@ -165,6 +168,16 @@ async function loadOrder() {
               )}
             </div>
           </div>
+
+          <!-- Tombol Batalkan Pesanan (Hanya Muncul Jika Status Pending & User Adalah Customer) -->
+          ${o.status === 'pending' && isCustomer ? `
+          <div style="margin-top: 1rem;">
+              <button onclick="cancelOrder()" class="btn-cancel">
+                  Batalkan Pesanan
+              </button>
+          </div>
+          ` : ''}
+          
         </div>
       </div>`;
     initFadeIn();
@@ -218,6 +231,23 @@ async function handlePay() {
     btn.disabled = false; btn.textContent = 'Bayar Sekarang →';
     errEl.textContent = e.data?.message || 'Gagal membuat pembayaran.';
     errEl.style.display = 'block';
+  }
+}
+
+async function cancelOrder() {
+  const isConfirm = confirm('Apakah Anda yakin ingin membatalkan dan menghapus pesanan ini? Aksi ini tidak dapat dibatalkan.');
+  
+  if (!isConfirm) return;
+
+  try {
+    await api('DELETE', '/orders/' + ORDER_ID);
+    showToast('Pesanan berhasil dibatalkan dan dihapus.', 'success');
+    
+    setTimeout(() => {
+        window.location.href = '/orders';
+    }, 1500);
+  } catch(e) {
+    showToast(e.data?.message || 'Gagal menghapus pesanan. Silakan coba lagi.', 'error');
   }
 }
 </script>
